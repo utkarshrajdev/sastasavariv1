@@ -318,6 +318,9 @@
           <label for="phone">Mobile Number (WhatsApp) *</label>
           <input type="tel" id="phone" name="phone" placeholder="10-digit mobile number" pattern="[6-9][0-9]{9}" maxlength="10" required>
 
+          <label for="email">Email (optional, for confirmation)</label>
+          <input type="email" id="email" name="email" placeholder="e.g. rahul@email.com">
+
           <label for="brand">Preferred Brand *</label>
           <select id="brand" name="brand" required>
             <option value="">-- Select brand --</option>
@@ -360,7 +363,7 @@
 
           <button type="submit" class="btn" id="submitBtn">Get Best Price – FREE</button>
           <a class="btn btn-wa" id="waBtn" href="#" target="_blank" rel="noopener">📲 Send on WhatsApp too</a>
-          <div class="success-msg" id="successMsg">✅ Thank you! Your query is saved. Our team will contact you within 30 minutes (9 AM – 8 PM).</div>
+          <div class="success-msg" id="successMsg">✅ Thank you! Your query is saved. Your reference code is <strong id="refCodeOut"></strong> — our team will contact you within 30 minutes (9 AM – 8 PM). Please quote this code when you call/WhatsApp us.</div>
           <div class="error-msg" id="errorMsg">⚠️ Something went wrong. Please try the WhatsApp button or call us directly.</div>
         </form>
       </div>
@@ -532,12 +535,23 @@
     });
   });
 
+  // Generates a friendly, user-specific SastaSavari reference code (e.g. SS-7K3QF9).
+  // Client-generated so it can be shown to the user immediately even though the
+  // Apps Script call below is fire-and-forget (mode:'no-cors', response unreadable).
+  function genRefCode() {
+    var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no ambiguous 0/O/1/I
+    var code = '';
+    for (var i = 0; i < 6; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+    return 'SS-' + code;
+  }
+
   var form = document.getElementById('leadForm');
   form.addEventListener('submit', function (e) {
     e.preventDefault();
 
     var name = document.getElementById('name').value.trim();
     var phone = document.getElementById('phone').value.trim();
+    var email = document.getElementById('email').value.trim();
     var brand = brandSel.value;
     var vehicle = vehicleSel.value;
     var buyplan = document.getElementById('buyplan').value;
@@ -548,13 +562,18 @@
       alert('Please fill your name, a valid 10-digit mobile number, brand, category and area.');
       return;
     }
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      alert('Please enter a valid email address, or leave it blank.');
+      return;
+    }
 
     var btn = document.getElementById('submitBtn');
     btn.disabled = true; btn.textContent = 'Sending...';
 
+    var refCode = genRefCode();
     var payload = {
-      name: name, phone: phone, brand: brand, vehicle: vehicle,
-      buyplan: buyplan, location: location, message: message,
+      name: name, phone: phone, email: email, brand: brand, vehicle: vehicle,
+      buyplan: buyplan, location: location, message: message, refCode: refCode,
       source: window.location.href, timestamp: new Date().toLocaleString('en-IN')
     };
 
@@ -570,12 +589,14 @@
     });
 
     function onSent() {
+      document.getElementById('refCodeOut').textContent = refCode;
       document.getElementById('successMsg').style.display = 'block';
       document.getElementById('errorMsg').style.display = 'none';
       btn.textContent = '✅ Submitted';
 
       var waText = "New Query – SastaSavari 🏍️\n" +
-        "Name: " + name + "\nPhone: " + phone +
+        "Ref Code: " + refCode +
+        "\nName: " + name + "\nPhone: " + phone +
         "\nBrand: " + brand + "\nCategory: " + vehicle + "\nBuying: " + buyplan +
         "\nArea: " + location + (message ? "\nNote: " + message : "");
       var waBtn = document.getElementById('waBtn');
