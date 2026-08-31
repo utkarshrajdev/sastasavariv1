@@ -318,9 +318,6 @@
           <label for="phone">Mobile Number (WhatsApp) *</label>
           <input type="tel" id="phone" name="phone" placeholder="10-digit mobile number" pattern="[6-9][0-9]{9}" maxlength="10" required>
 
-          <label for="email">Email (optional, for confirmation)</label>
-          <input type="email" id="email" name="email" placeholder="e.g. rahul@email.com">
-
           <label for="brand">Preferred Brand *</label>
           <select id="brand" name="brand" required>
             <option value="">-- Select brand --</option>
@@ -551,7 +548,6 @@
 
     var name = document.getElementById('name').value.trim();
     var phone = document.getElementById('phone').value.trim();
-    var email = document.getElementById('email').value.trim();
     var brand = brandSel.value;
     var vehicle = vehicleSel.value;
     var buyplan = document.getElementById('buyplan').value;
@@ -562,17 +558,18 @@
       alert('Please fill your name, a valid 10-digit mobile number, brand, category and area.');
       return;
     }
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      alert('Please enter a valid email address, or leave it blank.');
-      return;
-    }
 
     var btn = document.getElementById('submitBtn');
     btn.disabled = true; btn.textContent = 'Sending...';
 
+    // Reserve a tab synchronously (still inside the click gesture) so the
+    // WhatsApp chat can be opened automatically once submission succeeds,
+    // without triggering the browser's popup blocker.
+    var waWindow = window.open('', '_blank');
+
     var refCode = genRefCode();
     var payload = {
-      name: name, phone: phone, email: email, brand: brand, vehicle: vehicle,
+      name: name, phone: phone, brand: brand, vehicle: vehicle,
       buyplan: buyplan, location: location, message: message, refCode: refCode,
       source: window.location.href, timestamp: new Date().toLocaleString('en-IN')
     };
@@ -586,6 +583,7 @@
     }).then(function () { onSent(); }).catch(function () {
       document.getElementById('errorMsg').style.display = 'block';
       btn.disabled = false; btn.textContent = 'Get Best Price – FREE';
+      if (waWindow) waWindow.close();
     });
 
     function onSent() {
@@ -594,13 +592,18 @@
       document.getElementById('errorMsg').style.display = 'none';
       btn.textContent = '✅ Submitted';
 
+      // Auto-open WhatsApp, pre-filled with the lead details and addressed
+      // to our business number, so the customer just has to tap Send —
+      // this is how the admin gets notified (no email/SMS backend needed).
       var waText = "New Query – SastaSavari 🏍️\n" +
         "Ref Code: " + refCode +
         "\nName: " + name + "\nPhone: " + phone +
         "\nBrand: " + brand + "\nCategory: " + vehicle + "\nBuying: " + buyplan +
         "\nArea: " + location + (message ? "\nNote: " + message : "");
+      var waUrl = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(waText);
+      if (waWindow) { waWindow.location.href = waUrl; } else { window.open(waUrl, '_blank'); }
       var waBtn = document.getElementById('waBtn');
-      waBtn.href = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(waText);
+      waBtn.href = waUrl;
       waBtn.style.display = 'block';
     }
   });

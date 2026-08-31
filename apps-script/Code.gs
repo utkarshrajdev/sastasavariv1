@@ -1,8 +1,11 @@
 /**
  * SastaSavari – Lead Capture Script
- * Saves every website lead into this Google Sheet, emails you a notification,
- * AND emails the customer a confirmation with their SastaSavari reference code
- * (if they gave an email address on the form).
+ * Saves every website lead into this Google Sheet and emails you (the admin)
+ * a notification. There is no email field on the form anymore — the customer
+ * side of the notification is handled client-side instead: after a
+ * successful submit, index.html / get-price.html auto-open a WhatsApp chat
+ * pre-filled with the lead details and addressed to the business WhatsApp
+ * number, so the customer just taps Send.
  *
  * SETUP: paste this whole file into the Apps Script editor (Extensions > Apps
  * Script) attached to your Google Sheet, replacing the old Code.gs. Then
@@ -27,7 +30,7 @@
 
 // ====== EDIT THESE LINES ======
 var NOTIFY_EMAIL = "champaranconsultancyservices@gmail.com"; // email that receives lead alerts
-var FROM_EMAIL   = "sastasavari@gmail.com";                  // address customer emails are sent FROM (see SENDER ADDRESS note above)
+var FROM_EMAIL   = "sastasavari@gmail.com";                  // address the admin notification email is sent FROM (see SENDER ADDRESS note above)
 var FROM_NAME    = "SastaSavari";                             // friendly display name on outgoing emails
 // ===============================
 
@@ -39,8 +42,8 @@ function doPost(e) {
 
     // Add header row once
     if (sheet.getLastRow() === 0) {
-      sheet.appendRow(["Timestamp", "Ref Code", "Name", "Phone", "Email", "Brand", "Category", "Buying Plan", "Area", "Message", "Source Page"]);
-      sheet.getRange("A1:K1").setFontWeight("bold").setBackground("#e63912").setFontColor("#ffffff");
+      sheet.appendRow(["Timestamp", "Ref Code", "Name", "Phone", "Brand", "Category", "Buying Plan", "Area", "Message", "Source Page"]);
+      sheet.getRange("A1:J1").setFontWeight("bold").setBackground("#e63912").setFontColor("#ffffff");
       sheet.setFrozenRows(1);
     }
 
@@ -55,7 +58,6 @@ function doPost(e) {
       refCode,
       data.name || "",
       "'" + (data.phone || ""),   // apostrophe keeps leading digits as text
-      data.email || "",
       data.brand || "",
       data.vehicle || "",
       data.buyplan || "",
@@ -77,7 +79,6 @@ function doPost(e) {
         row("Name", data.name) +
         row("Phone", "<a href='tel:+91" + data.phone + "'>" + data.phone + "</a>") +
         row("WhatsApp", "<a href='https://wa.me/91" + data.phone + "'>Chat now</a>") +
-        row("Email", data.email || "-") +
         row("Brand", data.brand) +
         row("Category", data.vehicle) +
         row("Buying Plan", data.buyplan) +
@@ -86,35 +87,6 @@ function doPost(e) {
         row("Time", data.timestamp) +
         "</table>"
     });
-
-    // Confirmation email to the customer (only if they gave an email address)
-    if (data.email) {
-      try {
-        MailApp.sendEmail({
-          to: data.email,
-          from: FROM_EMAIL,
-          name: FROM_NAME,
-          subject: "✅ SastaSavari – We got your query! Ref: " + refCode,
-          htmlBody:
-            "<h2 style='color:#e63912'>Thanks for reaching out to SastaSavari, " + (data.name || "") + "!</h2>" +
-            "<p>We've received your query and our team will call/WhatsApp you within 30 minutes (9 AM – 8 PM).</p>" +
-            "<p style='font-size:16px'>Your reference code: <strong style='background:#fdecea;color:#e63912;padding:4px 10px;border-radius:6px'>" + refCode + "</strong></p>" +
-            "<p>Please quote this code whenever you call or WhatsApp us about this query.</p>" +
-            "<table cellpadding='6' style='border-collapse:collapse;font-family:Arial'>" +
-            row("Brand", data.brand) +
-            row("Category", data.vehicle) +
-            row("Buying Plan", data.buyplan) +
-            row("Area", data.location) +
-            row("Message", data.message || "-") +
-            "</table>" +
-            "<p>Need us sooner? WhatsApp us directly: <a href='https://wa.me/919523619389'>Chat now</a></p>" +
-            "<p style='color:#888;font-size:12px'>SastaSavari – Motihari & Bettiah, East &amp; West Champaran</p>"
-        });
-      } catch (userMailErr) {
-        // Don't fail the whole request if the customer's email bounces/is invalid
-        Logger.log("Customer confirmation email failed: " + userMailErr);
-      }
-    }
 
     return ContentService.createTextOutput(JSON.stringify({ ok: true, refCode: refCode }))
       .setMimeType(ContentService.MimeType.JSON);

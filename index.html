@@ -417,13 +417,13 @@
     </div>
     <div class="container hero-grid">
       <div>
-        <h1>Best <em>Two Wheeler Deals</em> in Motihari &amp; Bettiah, East &amp; West Champaran, Bihar</h1>
-        <p class="sub">Compare on-road prices of bikes &amp; scooty from top showrooms in Motihari &amp; Bettiah. Lowest price, easy EMI, exchange offers — 100% free service. सस्ती सवारी, सही दाम।</p>
+        <h1>Best <em>Two Wheeler Deals</em> in India, starting from Bihar</h1>
+        <p class="sub">Compare on-road prices of bikes &amp; scooty from top showrooms in Motihari, Bettiah &amp; Sheohar. Lowest price, easy EMI, exchange offers — 100% free service. सस्ती सवारी, सही दाम।</p>
         <div class="badges">
           <span class="badge">✅ Free price quote in 30 min</span>
           <span class="badge">🏍️ All brands &amp; models</span>
           <span class="badge">💳 Low EMI &amp; exchange offers</span>
-          <span class="badge">📍 Motihari · Bettiah · East &amp; West Champaran</span>
+          <span class="badge">📍 Motihari · Bettiah · Sheohar</span>
           <a class="badge" href="#race" style="text-decoration:none;color:#fff;background:var(--flame);border:none;animation:glowPulse 1.6s infinite;">🏁 NEW: Play Bike Racer — win real rewards!</a>
         </div>
 
@@ -478,9 +478,6 @@
 
           <label for="phone">Mobile Number (WhatsApp) *</label>
           <input type="tel" id="phone" name="phone" placeholder="10-digit mobile number" pattern="[6-9][0-9]{9}" maxlength="10" required>
-
-          <label for="email">Email (optional, for confirmation)</label>
-          <input type="email" id="email" name="email" placeholder="e.g. rahul@email.com">
 
           <label for="brand">Preferred Brand *</label>
           <select id="brand" name="brand" required>
@@ -687,7 +684,7 @@
   <div class="container">
     <h4>SastaSavari — सस्ती सवारी, सही दाम</h4>
     <p>Best two wheeler deals, bike &amp; scooty on-road prices, EMI and exchange offers in Motihari, Bettiah, East &amp; West Champaran, Bihar.</p>
-    <p class="cities"><strong>Areas served:</strong> Motihari · Bettiah · Chakia · Raxaul · Areraj · Maheshi · Puran Chhapra · Madhuban · Kalyanpur · Khajuria · Sangrampur · Paharpur · Harsiddhi · Pipra · Pipra Kothi · Kotwa · Lakhaura · Chhauradano · Ghorasahan · Phenhara · Karmawa Raghunathpur · Sugauli · Adapur · Bazhiya · Panchpakari · Dhaka · Pakridayal · Kesaria · East &amp; West Champaran · Bihar</p>
+    <p class="cities"><strong>Areas served:</strong> Motihari · Bettiah · Sheohar · Chakia · Raxaul · Areraj · Maheshi · Puran Chhapra · Madhuban · Kalyanpur · Khajuria · Sangrampur · Paharpur · Harsiddhi · Pipra · Pipra Kothi · Kotwa · Lakhaura · Chhauradano · Ghorasahan · Phenhara · Karmawa Raghunathpur · Sugauli · Adapur · Bazhiya · Panchpakari · Dhaka · Pakridayal · Kesaria · East &amp; West Champaran · Bihar</p>
     <p style="margin-top:14px;"><strong>Contact:</strong> <a href="tel:+918986587089" style="color:var(--teal);text-decoration:none;">📞 +91 89865 87089</a> &nbsp;·&nbsp; <a href="mailto:sastasavari@gmail.com" style="color:var(--teal);text-decoration:none;">✉️ sastasavari@gmail.com</a></p>
     <p>📍 2nd Floor, Main Road, Motihari, East Champaran, Bihar 845401</p>
     <p style="margin-top:14px;">© <span id="year"></span> SastaSavari. All rights reserved.</p>
@@ -779,7 +776,6 @@
 
     var name = document.getElementById('name').value.trim();
     var phone = document.getElementById('phone').value.trim();
-    var email = document.getElementById('email').value.trim();
     var brand = brandSel.value;
     var vehicle = vehicleSel.value;
     var buyplan = document.getElementById('buyplan').value;
@@ -790,17 +786,18 @@
       alert('Please fill your name, a valid 10-digit mobile number, brand, category and area.');
       return;
     }
-    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      alert('Please enter a valid email address, or leave it blank.');
-      return;
-    }
 
     var btn = document.getElementById('submitBtn');
     btn.disabled = true; btn.textContent = 'Sending...';
 
+    // Reserve a tab synchronously (still inside the click gesture) so the
+    // WhatsApp chat can be opened automatically once submission succeeds,
+    // without triggering the browser's popup blocker.
+    var waWindow = window.open('', '_blank');
+
     var refCode = genRefCode();
     var payload = {
-      name: name, phone: phone, email: email, brand: brand, vehicle: vehicle,
+      name: name, phone: phone, brand: brand, vehicle: vehicle,
       buyplan: buyplan, location: location, message: message, refCode: refCode,
       source: window.location.href, timestamp: new Date().toLocaleString('en-IN')
     };
@@ -814,6 +811,7 @@
     }).then(function () { onSent(); }).catch(function () {
       document.getElementById('errorMsg').style.display = 'block';
       btn.disabled = false; btn.textContent = 'Get Best Price – FREE';
+      if (waWindow) waWindow.close();
     });
 
     function onSent() {
@@ -822,14 +820,18 @@
       document.getElementById('errorMsg').style.display = 'none';
       btn.textContent = '✅ Submitted';
 
-      // Show WhatsApp button pre-filled with the lead details
+      // Auto-open WhatsApp, pre-filled with the lead details and addressed
+      // to our business number, so the customer just has to tap Send —
+      // this is how the admin gets notified (no email/SMS backend needed).
       var waText = "New Query – SastaSavari 🏍️\n" +
         "Ref Code: " + refCode +
         "\nName: " + name + "\nPhone: " + phone +
         "\nBrand: " + brand + "\nCategory: " + vehicle + "\nBuying: " + buyplan +
         "\nArea: " + location + (message ? "\nNote: " + message : "");
+      var waUrl = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(waText);
+      if (waWindow) { waWindow.location.href = waUrl; } else { window.open(waUrl, '_blank'); }
       var waBtn = document.getElementById('waBtn');
-      waBtn.href = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodeURIComponent(waText);
+      waBtn.href = waUrl;
       waBtn.style.display = 'block';
     }
   });
