@@ -60,7 +60,7 @@
     .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
 
     /* Header — app style glass bar */
-    header { background: rgba(11,11,26,.72); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 50; }
+    header { background: rgba(11,11,26,.72); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); position: sticky; top: var(--ob-h, 0px); z-index: 50; }
     .nav { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; }
     .logo { display: flex; align-items: center; gap: 8px; font-size: 1.55rem; font-weight: 700; text-decoration: none; background: var(--flame); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .logo span { color: var(--dark); -webkit-text-fill-color: var(--dark); }
@@ -105,7 +105,7 @@
     @keyframes rl { to { stroke-dashoffset: -66; } }
 
     /* Form card — dark glass */
-    .form-card { background: var(--card); border: 1px solid var(--line); color: var(--dark); border-radius: var(--radius); padding: 26px; box-shadow: 0 18px 50px rgba(0,0,0,.5), 0 0 0 1px rgba(255,140,43,.08); position: relative; }
+    .form-card { background: var(--card); border: 1px solid var(--line); color: var(--dark); border-radius: var(--radius); padding: 26px; box-shadow: 0 18px 50px rgba(0,0,0,.5), 0 0 0 1px rgba(255,140,43,.08); position: relative; scroll-margin-top: 90px; }
     .form-card::before { content: ""; position: absolute; inset: -1px; border-radius: var(--radius); padding: 1px; background: linear-gradient(140deg, rgba(255,77,28,.55), transparent 30%, transparent 70%, rgba(53,224,176,.4)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
     .form-card h2 { font-size: 1.3rem; margin-bottom: 4px; }
     .form-card p.note { font-size: .85rem; color: var(--grey); margin-bottom: 16px; }
@@ -227,9 +227,59 @@
       .hero-grid { grid-template-columns: 1fr; }
       .hero h1 { font-size: 1.55rem; }
     }
+
+    /* ===== LAUNCH OFFER — sticky bar ===== */
+    .offer-bar { position: sticky; top: 0; z-index: 55; background: var(--flame); background-size: 220% auto; animation: shimmer 6s linear infinite; }
+    .offer-bar-inner { max-width: 1100px; margin: 0 auto; padding: 9px 44px 9px 16px; display: flex; align-items: center; justify-content: center; gap: 9px; flex-wrap: wrap; text-align: center; font-size: .83rem; font-weight: 700; color: #fff; position: relative; }
+    .offer-bar .ob-tag { background: rgba(0,0,0,.24); padding: 3px 10px; border-radius: 30px; font-size: .68rem; letter-spacing: 1px; font-family: 'Rajdhani', sans-serif; animation: glowPulse 1.8s infinite; }
+    .offer-bar .ob-amt { background: rgba(0,0,0,.2); padding: 1px 9px; border-radius: 6px; font-family: 'Rajdhani', sans-serif; font-size: 1rem; font-weight: 800; }
+    .offer-bar a.ob-claim { background: #fff; color: var(--primary-dark); padding: 5px 14px; border-radius: 30px; text-decoration: none; font-weight: 800; font-size: .78rem; white-space: nowrap; }
+    .offer-bar .ob-close { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #fff; opacity: .85; font-size: 1.15rem; cursor: pointer; padding: 6px 10px; line-height: 1; }
+    .offer-bar .ob-close:hover { opacity: 1; }
+
+    /* ===== LAUNCH OFFER — popup ===== */
+    .offer-overlay { position: fixed; inset: 0; background: rgba(5,5,15,.72); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity .3s ease; }
+    .offer-overlay.show { opacity: 1; pointer-events: auto; }
+    .offer-modal { position: relative; max-width: 380px; width: 100%; background: var(--card); border-radius: 20px; padding: 30px 26px 26px; text-align: center; box-shadow: 0 30px 80px rgba(0,0,0,.6); transform: scale(.85) translateY(20px); opacity: 0; transition: transform .35s cubic-bezier(.2,.9,.3,1.4), opacity .3s ease; overflow: hidden; }
+    .offer-overlay.show .offer-modal { transform: scale(1) translateY(0); opacity: 1; }
+    .offer-modal::before { content: ""; position: absolute; inset: -1px; border-radius: 20px; padding: 1px; background: linear-gradient(140deg, rgba(255,183,3,.7), transparent 35%, transparent 65%, rgba(53,224,176,.5)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
+    .offer-modal .om-close { position: absolute; top: 8px; right: 10px; background: none; border: none; color: var(--grey); font-size: 1.3rem; cursor: pointer; padding: 8px; line-height: 1; z-index: 1; }
+    .offer-modal .om-close:hover { color: #fff; }
+    .offer-modal .om-kicker { display: inline-block; font-size: .72rem; letter-spacing: 2px; font-weight: 800; color: var(--gold); background: rgba(255,183,3,.12); padding: 4px 12px; border-radius: 30px; margin-bottom: 14px; }
+    .offer-modal h3 { font-size: 1.42rem; margin-bottom: 2px; }
+    .offer-modal .om-amt { font-family: 'Rajdhani', sans-serif; font-size: 3rem; font-weight: 800; line-height: 1; background: var(--flame); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 0 18px rgba(255,140,43,.5)); margin: 6px 0 12px; }
+    .offer-modal p.om-sub { color: #c3c8e8; font-size: .89rem; margin-bottom: 16px; }
+    .offer-modal .om-areas { display: flex; justify-content: center; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+    .offer-modal .om-areas span { background: rgba(255,255,255,.08); border: 1px solid var(--line); padding: 4px 12px; border-radius: 30px; font-size: .76rem; font-weight: 700; }
+    .offer-modal .om-cta { display: block; width: 100%; background: var(--flame); color: #fff; border: none; padding: 14px; border-radius: 12px; font-weight: 800; font-size: 1rem; text-decoration: none; box-shadow: 0 8px 26px rgba(255,77,28,.4); font-family: 'Rajdhani', sans-serif; letter-spacing: .6px; cursor: pointer; animation: glowPulse 1.8s infinite; }
+    .offer-modal .om-fine { margin-top: 12px; font-size: .72rem; color: var(--grey); }
+    .offer-modal .om-sparkle { position: absolute; font-size: 1.15rem; opacity: .8; animation: sparkle 2.4s ease-in-out infinite; pointer-events: none; }
+    @keyframes sparkle { 0%, 100% { opacity: .2; transform: scale(.7) rotate(0deg); } 50% { opacity: 1; transform: scale(1.15) rotate(20deg); } }
+
+    /* offer reinforcement chip inside the form card */
+    .offer-chip { display: flex; align-items: center; gap: 8px; background: rgba(255,183,3,.1); border: 1px solid rgba(255,183,3,.35); color: #ffd27a; padding: 9px 12px; border-radius: 10px; font-size: .82rem; font-weight: 700; margin: 12px 0 4px; }
+
+    @media (max-width: 480px) {
+      .offer-bar-inner { font-size: .78rem; padding: 8px 40px 8px 12px; }
+      .offer-modal { padding: 26px 20px 22px; }
+      .offer-modal .om-amt { font-size: 2.5rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .offer-bar, .offer-bar .ob-tag, .offer-modal .om-cta, .offer-modal .om-sparkle { animation: none !important; }
+    }
   </style>
 </head>
 <body>
+
+<!-- LAUNCH OFFER — sticky bar -->
+<div class="offer-bar" id="offerBar">
+  <div class="offer-bar-inner">
+    <span class="ob-tag">🎉 LAUNCH OFFER</span>
+    <span>Get <span class="ob-amt">₹1,100 EXTRA</span> off at the showroom — Motihari · Bettiah · Sheohar</span>
+    <a class="ob-claim" href="#lead-form">Claim Now</a>
+    <button class="ob-close" id="offerBarClose" aria-label="Dismiss offer">✕</button>
+  </div>
+</div>
 
 <header>
   <div class="container nav">
@@ -311,6 +361,7 @@
       <div class="form-card" id="lead-form">
         <h2>Get Your Best Price Quote 🏍️</h2>
         <p class="note">Fill the form — our team will call/WhatsApp you with the lowest price.</p>
+        <p class="offer-chip">🎁 Launch Offer: +₹1,100 extra discount — show your code at the showroom</p>
         <form id="leadForm" novalidate>
           <label for="name">Full Name *</label>
           <input type="text" id="name" name="name" placeholder="e.g. Rahul Kumar" required>
@@ -360,7 +411,7 @@
 
           <button type="submit" class="btn" id="submitBtn">Get Best Price – FREE</button>
           <a class="btn btn-wa" id="waBtn" href="#" target="_blank" rel="noopener">📲 Send on WhatsApp too</a>
-          <div class="success-msg" id="successMsg">✅ Thank you! Your query is saved. Your reference code is <strong id="refCodeOut"></strong> — our team will contact you within 30 minutes (9 AM – 8 PM). Please quote this code when you call/WhatsApp us.</div>
+          <div class="success-msg" id="successMsg">✅ Thank you! Your query is saved. Your reference code is <strong id="refCodeOut"></strong> — our team will contact you within 30 minutes (9 AM – 8 PM). Show this code at the showroom to get your ₹1,100 launch offer discount!</div>
           <div class="error-msg" id="errorMsg">⚠️ Something went wrong. Please try the WhatsApp button or call us directly.</div>
         </form>
       </div>
@@ -474,6 +525,22 @@
   <a href="#lead-form" class="bn-cta">📝<span>Quote</span></a>
 </nav>
 
+<!-- LAUNCH OFFER — popup -->
+<div class="offer-overlay" id="offerOverlay">
+  <div class="offer-modal">
+    <span class="om-sparkle" style="top:14px; left:18px;">✨</span>
+    <span class="om-sparkle" style="bottom:16px; right:20px; animation-delay:1.1s;">✨</span>
+    <button class="om-close" id="offerClose" aria-label="Close">✕</button>
+    <span class="om-kicker">🎉 LAUNCH OFFER</span>
+    <h3>Extra Cash Off, On Us!</h3>
+    <div class="om-amt">₹1,100 OFF</div>
+    <p class="om-sub">Get your free SastaSavari code, show it at the showroom, and get ₹1,100 EXTRA discount — on top of the dealer's own offer.</p>
+    <div class="om-areas"><span>Motihari</span><span>Bettiah</span><span>Sheohar</span></div>
+    <a class="om-cta" id="offerClaimBtn" href="#lead-form">Get My Free Code →</a>
+    <p class="om-fine">Limited-time launch offer · Valid at partner showrooms</p>
+  </div>
+</div>
+
 <script>
   /* ================= CONFIGURATION – kept identical to the homepage so leads land in the same sheet ================= */
   var WHATSAPP_NUMBER = "919523619389";
@@ -481,6 +548,51 @@
   /* ====================================================================== */
 
   document.getElementById('year').textContent = new Date().getFullYear();
+
+  // ===== LAUNCH OFFER: sticky bar + popup =====
+  (function () {
+    var BAR_KEY = 'ss_offerbar_hide_until';
+    var POPUP_KEY = 'ss_offerpopup_hide_until';
+    var now = Date.now();
+    var DAY = 24 * 60 * 60 * 1000;
+
+    // Sticky bar — dismiss hides it for 24h; header slides up to fill the gap.
+    var bar = document.getElementById('offerBar');
+    if (bar) {
+      if (now < (+localStorage.getItem(BAR_KEY) || 0)) {
+        bar.remove();
+      } else {
+        var setOffset = function () { document.documentElement.style.setProperty('--ob-h', bar.offsetHeight + 'px'); };
+        setOffset();
+        window.addEventListener('resize', setOffset);
+        var barClose = document.getElementById('offerBarClose');
+        if (barClose) barClose.addEventListener('click', function () {
+          bar.remove();
+          document.documentElement.style.setProperty('--ob-h', '0px');
+          localStorage.setItem(BAR_KEY, now + DAY);
+        });
+      }
+    }
+
+    // Popup — shows once, a couple seconds after load; dismiss hides it for
+    // 1 day, claiming the offer (they're engaged) hides it for a week.
+    var overlay = document.getElementById('offerOverlay');
+    if (overlay) {
+      var closePopup = function (days) {
+        overlay.classList.remove('show');
+        localStorage.setItem(POPUP_KEY, now + days * DAY);
+      };
+      if (now >= (+localStorage.getItem(POPUP_KEY) || 0)) {
+        setTimeout(function () { overlay.classList.add('show'); }, 2200);
+      }
+      var popupClose = document.getElementById('offerClose');
+      if (popupClose) popupClose.addEventListener('click', function () { closePopup(1); });
+      overlay.addEventListener('click', function (e) { if (e.target === overlay) closePopup(1); });
+      var claimBtn = document.getElementById('offerClaimBtn');
+      if (claimBtn) claimBtn.addEventListener('click', function () { closePopup(7); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closePopup(1); });
+    }
+  })();
 
   // scroll-reveal animation (app-like feel)
   (function () {
