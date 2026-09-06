@@ -414,7 +414,11 @@
     .offer-chip { display: flex; align-items: center; gap: 8px; background: rgba(255,183,3,.1); border: 1px solid rgba(255,183,3,.35); color: #ffd27a; padding: 9px 12px; border-radius: 10px; font-size: .82rem; font-weight: 700; margin: 12px 0 4px; }
 
     @media (max-width: 480px) {
-      .offer-bar-inner { font-size: .78rem; padding: 8px 40px 8px 12px; }
+      .offer-bar-inner { font-size: .74rem; padding: 7px 32px 7px 10px; gap: 5px 8px; }
+      .offer-bar .ob-tag, .offer-bar .ob-where { display: none; }
+      .offer-bar .ob-amt { font-size: .88rem; padding: 1px 6px; }
+      .offer-bar a.ob-claim { padding: 4px 11px; font-size: .72rem; }
+      .offer-bar .ob-close { font-size: 1rem; padding: 6px 8px; }
       .offer-modal { padding: 26px 20px 22px; }
       .offer-modal .om-amt { font-size: 2.5rem; }
     }
@@ -429,7 +433,7 @@
 <div class="offer-bar" id="offerBar">
   <div class="offer-bar-inner">
     <span class="ob-tag">🎉 LAUNCH OFFER</span>
-    <span>Get <span class="ob-amt">₹1,100 EXTRA</span> off at the showroom — Motihari · Bettiah · Sheohar</span>
+    <span>Get <span class="ob-amt">₹1,100 EXTRA</span> off at the showroom<span class="ob-where"> — Motihari · Bettiah · Sheohar</span></span>
     <a class="ob-claim" href="#lead-form">Claim Now</a>
     <button class="ob-close" id="offerBarClose" aria-label="Dismiss offer">✕</button>
   </div>
