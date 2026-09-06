@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // .tool_response.filePath' | { read -r f; case \"$f\" in */apps-script/Code.gs) echo '{\"systemMessage\": \"Code.gs edited \u2014 this is NOT auto-deployed. Paste the file into the Apps Script editor and redeploy (Deploy > Manage deployments > Edit > New version > Deploy).\"}' ;; esac; } 2>/dev/null || true"
+          }
+        ]
+      }
+    ]
+  }
+}
